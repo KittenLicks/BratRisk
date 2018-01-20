@@ -1,0 +1,583 @@
+<html>
+<body>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script>
+        var spintick = new Audio('spin.wav');
+        var level = 1;
+        var bratcount = 1;
+        var brattotal = 1;
+        var goodcount = 10;
+        var goodtotal = 10;
+        var spinning=false;
+        var uber= false;
+        var finished = false;
+        var story = ["",
+        "",
+        "Your Dom turns over and you quickly drop the feather and neatly sit up. But no! He just goes back to sleep. Time for stronger measures...<br> You grab the half empty glass of water sitting on the bedside table and carefully lift the duvet again. You slowly pour the water onto the crotch of your Dom’s' underwear. He shoots into an upright position and you quickly return to your spot on the floor, looking sheepish.",
+        "Your Dom is definitely awake now and not pleased. He looks down at you with an angry expression and asks you what all this is about.<br>You bluff and tell your Dom that he must have wet his pants during the night and mutter \"<em>such a bed wetter</em>\" under your breath.",
+        "Your Dom is not pleased. At all. He looks at you with a stern expression and asks \"What do you have to say for yourself. How did this water get on my pants?!\"<br>You reply in your sweetest voice \"I was thirsty Sir, and I took a drink of water, but then a fly landed on my nose and I sneezed\".",
+        "Your Dom is fed up with you. He unlocks the chain from the bed and drags you to the kitchen. There, you are chained to the table leg so he can keep an eye on you. He wants to have some breakfast and doesn't want to be disturbed.<br>Your Dom’s having coffee and sandwiches, while he plops a dog bowl with nasty grey mush in front of you on the floor. \"You won't get released until you've finished this\" you get told.<br>You sigh. It's not fair! Your Dom is enjoying himself and meanwhile, you're stuck here. You see him kick of his loafers and lean back, loudly sipping his coffee. This calls for justice you think!<br>You grab the dog bowl and carefully scoop a good portion of the grey mush into the shoes. Good, now there's not so much nasty food left to eat.",
+        "You quickly eat the remaining mush and proudly announce that you've eaten all your food. Your Dom looks pleased at first, but also a tad suspicious...<br>He looks you in the eyes and asks \"Have you really finished your meal? I suggest you think hard before you answer me.\"",
+        "You give him big puppy eyes and nod yes. It wasn't untrue right?<br>Slowly, your Dom nods. \"Okay...if you say so...\"<br>\"Let's go for a walk then.\" He grabs your chain and starts to put his bare feet back into his shoes.<br>You stare... no way back now. Almost... \"Squishhh!\" A nasty sound emerges from the shoes. And then a \"Fuck!\" from your Dom's mouth. He holds up his now dirty feet in front of your face.<br>You suppress the urge to burst out laughing. The look on his face is priceless. The best action now would be to kneel submissively and show him you're sorry...",
+        "You can't keep it back any longer, and uncontrollable giggles burst from your mouth. The angrier your Dom looks, the harder it makes you laugh. You know it's not wise, but it's just so hilarious, the way he's trying not to squish the mush between his toes even more. Besides, how bad can it be?<br>\"Lick!\" says your Dom, with a hard yank on the chain. \"He's got to be kidding, I'm not licking those!\" You think. You keep your mouth shut tightly.<br>Your Dom looks menacingly at you. \"If you lick my feet clean, it might reduce your punishment somewhat. If not, well...\"",
+        "You reluctantly stick out your tongue and lick. It might be better to cooperate after all…<br>Your Dom is looking triumphant now. He gloats \“Pay special attention while licking between my toes.\”<br>Yuck, it’s gross! You try another lick, but you really don’t like this. You’re not a wuss. You want to hold up your bratty standards... You look up at your Dom and are on the verge of making a very stupid decision…",
+        "As your Dom is happily wiggling his toes, and being oh so satisfied with your predicament, you open your mouth and…<br>\“Ouch!!!\” Your Dom shrieks as you sink your teeth in his big toe. He grabs you by the hair and drags you to the cellar where he chains you to the floor. As he stands over you, he tells you:\“You have really done it now! You won’t get out until we’ve completed your punishment, and don’t expect to have much fun.\”",
+        "",
+        ""]
+        function bratRoll()
+        {
+            if (!spinning && !finished)
+            {
+                spinning = true;
+                bratcount--;
+                updateCounts();
+                var children = $('#bratwheel').children();
+                var force = randNum(5)+20;
+                var startforce=force;
+                var selected = 0;
+                var next = function(){
+                    force--;
+                    if (force> 0)
+                    {
+                        selected++;
+                        timeout = 30
+                        if (force < 5)
+                        {
+                            timeout=500
+                        }
+                        else if (force<10)
+                        {
+                            timeout = 200;
+                        }
+                        else if (force<15)
+                        {
+                            timeout = 100;
+                        }
+                        else if (force < 20)
+                        {
+                            timeout = 60
+                        }
+                        if (selected > 3)
+                        {
+                            selected = 0;
+                        }
+                        spinSound();
+                        $('.chosen').removeClass('chosen');
+                        $(children[selected]).addClass('chosen');
+                        setTimeout(next, timeout);
+                    }
+                    else
+                    {
+                        spinning = false;
+                        var amt = $(children[selected]).attr('amount');
+                        var id = '#inc'+selected;
+                        var elem = $(id);
+                        var num = elem.html();
+                        num = parseInt(num);
+                        num+=parseInt(amt);
+                        elem.addClass('redflash');
+                        setTimeout(function(){
+                            elem.removeClass('redflash');
+                            elem.html(num);
+                            checkVis();
+                            checkLevel()
+                        },150);                        
+                    }
+                }
+                next()
+            }           
+        }
+        function checkLevel()
+        {
+            if (bratcount <=0)
+            {
+                if (level == 10)
+                {
+                    finished = true;
+                    var str = "You've earned the right to call yourself an über brat and deserve the respect of your fellow brats! Do all your punishments (brats don't get rewards), then be sure to post in the thread to claim your bragging rights! :D";                    
+                    $('.story').html(str);
+                    $('.tagline').html("You made it all the way to level 10! Doms, be afraid of the... <h3 class='rainbow'>ÜBER BRAT</h3>");
+                }
+                else
+                {
+                    //Level up!
+                    level++;
+                    bratcount = level;
+                    goodcount = 11 - level;
+                    updateCounts();
+                    updateStory();
+                    if (level == 10)
+                    {
+                        //Uber brat!!
+                        uberBrat();
+                    }
+                }  
+            }
+            else if (goodcount <=0)
+            {
+                //Finished!
+                spinning = true;
+                var str ="You're finished! Go enjoy your rewards, and finish your punishments, then be sure to post in the thread, so you can see how you matched up to the other brats. :D";
+                $('.story').html(str);
+                $('.tagline').html('You made it to level <span class="final">'+level+'</span> before you chose to be good.');
+            }
+                
+        }
+        function uberBrat()
+        {
+            var str = "You've earned another <strong>10</strong> spins on the Wheel of Risk. And you can say goodbye to your last reward. Brat.";
+            $('.tagline').html(str);
+            $('.goodcount').html('X');
+            $('#rewardsh2, .placeholdertext').remove();
+            uber = true;
+        }
+        function updateStory()
+        {
+            $('.story').html(story[level]);
+        }
+        function checkVis()
+        {
+            var counters = $('.counter');
+            for (i=0;i<counters.length;i++)
+            {
+                var val = counters[i].innerHTML;
+                if (val != '0')
+                {
+                    var parent = $(counters[i]).parent();
+                    if (!parent.hasClass('visible'))
+                    {
+                        parent.addClass('visible');
+                    }
+                    var place = parent.siblings('.placeholdertext');
+                    if (place.length>0)
+                    {
+                        place.remove();
+                    }
+                }
+            }
+        }
+        function spinSound()
+        {
+            spintick.pause();
+            spintick.currentTime = 0;
+            spintick.play();
+        }
+        function randNum(max)
+        {
+            return Math.floor(Math.random()*max)+1;
+        }
+        function updateCounts()
+        {
+            $('.bratcount').html(numToStr(bratcount));
+            if (!uber)
+            {
+                $('.goodcount').html(numToStr(goodcount));    
+            }
+            $('.lvl').html(level);
+        }
+        function numToStr(num)
+        {
+            return (num < 10? '0'+num:num)
+        }
+        function goodRoll()
+        {
+            if (!spinning && !uber)
+            {
+                $("#bratbutton").addClass('disabled');
+                finished = true;
+                spinning = true;
+                goodcount--;
+                updateCounts();
+                var children = $('#goodwheel').children();
+                var force = randNum(5)+30;
+                var startforce=force;
+                var selected = 0;
+                var next = function(){
+                    force--;
+                    if (force> 0)
+                    {
+                        selected++;
+                        timeout = 30
+                        if (force < 5)
+                        {
+                            timeout=500
+                        }
+                        else if (force<10)
+                        {
+                            timeout = 200;
+                        }
+                        else if (force<15)
+                        {
+                            timeout = 100;
+                        }
+                        else if (force < 20)
+                        {
+                            timeout = 60
+                        }
+                        if (selected > 3)
+                        {
+                            selected = 0;
+                        }
+                        spinSound();
+                        $('.chosen').removeClass('chosen');
+                        $(children[selected]).addClass('chosen');
+                        setTimeout(next, timeout);
+                    }
+                    else
+                    {
+                        spinning = false;
+                        var amt = $(children[selected]).attr('amount');
+                        var id = '#rew'+selected;
+                        var elem = $(id);
+                        var num = elem.html();
+                        num = parseInt(num);
+                        num+=parseInt(amt);
+                        elem.addClass('greenflash');
+                        setTimeout(function(){
+                            elem.removeClass('greenflash');
+                            elem.html(num);
+                            checkVis();
+                            checkLevel()
+                        },200);
+                       
+                    }
+                }
+                next()
+            } 
+        }
+        $(document).ready(function(){
+            $('#bratbutton').click(bratRoll);
+            $('#goodbutton').click(goodRoll);
+        });
+        
+    </script>
+    <style>
+        .rainbow {
+            display:inline;
+            font-size: 24px;
+            font-family:Arial;
+          background-image: -webkit-gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+          background-image: gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+          color:transparent;
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+        .final
+        {
+            font-weight:bold;
+            font-size:20px;
+        }
+        body,html
+        {
+            width:100%;
+            height:100%;   
+            margin:0;
+            padding:0;
+        }
+        h1
+        {
+            font-size:40px;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 30px;
+            color:purple;
+            padding-bottom:0;
+            margin:0;
+        }
+        .good
+        {
+            color:#219421;
+            font-weight:bold;
+        }
+        .brat
+        {
+            color: #bb4141;
+            font-weight:bold;
+        }
+        .redflash
+        {
+            color:red;
+        }
+        .greenflash
+        {
+            color:lime;
+        }
+        .container
+        {
+            width:100%;
+            display:inline-block;
+            text-align:center;    
+        }
+        .container:after
+        {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        .wheelcontainer
+        {
+            width: 20%;
+            display:inline-block;            
+        }
+        .wheelcontainer h2
+        {
+            text-align:center;
+            font-size: 30px;
+            font-family:Arial;
+            margin:0;
+            padding: 0;
+        }
+        .wheel
+        {
+            width:95%;            
+            display:inline-block;
+            list-style:none;
+            font-size:20px;
+            font-family:Arial;
+            cursor: default;
+            border: 5px solid black;
+            padding:0;
+            margin:0;
+            margin-top:5px;
+            margin-bottom:15px;
+        }
+        .wheel li
+        {
+            padding: 20px;
+            height: 50px;
+            background:#bb4141;
+            color: #e6e6e6;
+            text-align:center;
+            vertical-align: middle;
+            position:relative;
+            border: 5px solid transparent;
+            border-top-color: #d16c6c;
+        }
+        .rewardcontainer .wheel li
+        {   
+            background:#219421;
+            border-top-color: #33b433;
+        }
+        .wheel li:first-child
+        {
+            border-top-color: transparent;
+        }
+        #goodwheel li.chosen
+        {
+            color:white;
+            border: 5px solid #45ff4d;
+            background:#0bcb14;
+        }
+        #bratwheel li.chosen
+        {
+            color:white;
+            border: 5px solid #6f0000;
+            background:#dc2828;
+        }
+        .wheel li span
+        {
+            position:absolute;
+            left:50%;
+            top:50%;
+            transform:translate(-50%,-50%);
+        }
+        #bratbutton:hover
+        {
+            background:#ed6cff;
+        }
+        #bratbutton, #bratbutton:active
+        {
+            background:#e83bff;
+        }
+        #goodbutton:hover
+        {
+            background:#adfafa;
+        }
+        #goodbutton, #goodbutton:active
+        {
+            background:#74c7c7;        
+        }
+        #bratbutton.disabled
+        {
+            background: #d7d7d7;
+            border-color: black;
+            color: grey;       
+        }
+        #bratbutton.disabled img, #bratbutton.disabled .spincount        
+        {
+            display:none;
+        }        
+        button
+        {
+            width:80%;
+            height: 50px;
+            font-size: 20px;
+            font-family:Arial;            
+            outline:none;
+            border:2px solid black;
+            display:block;
+            margin:0 auto;
+            cursor:pointer;
+            color:black;
+            position:relative;
+        }
+        button img
+        {
+            position:absolute;
+            height: 50px;
+            width:50px;
+        }
+        button .devil
+        {
+            left:10px;
+            top:50%;
+            transform:translate(0,-50%);
+        }
+        button .angel
+        {
+            right:10px;
+            top:50%;
+            transform:translate(0,-50%);
+            height: 30px;
+            width:30px;
+        }
+        .info
+        {
+            width:45%;
+            display:inline-block;
+            vertical-align: top;
+        } 
+        .info h2
+        {
+            text-align:center;
+            font-size:30px;
+            font-family:Arial;
+            margin:0;
+            padding:10px 0;            
+        } 
+        .info .stats
+        {
+            width: 80%;
+            display: block;
+            margin: 0 auto;
+        }
+        .info .stats .story
+        {
+            font-size: 16px;
+            font-family: Arial;
+            margin:0;
+            padding:0;
+            text-align:left;
+        }
+        .spincount
+        {
+            position:absolute;
+            border-radius:5px;
+            padding: 5px;        
+            top:50%;        
+            transform:translate(0,-50%);
+            font-size: 16px;
+        }
+        .bratcount
+        {
+            background:#bb4141;
+            right: 10px;
+        }
+        .goodcount
+        {
+            background:#219421;
+            left: 10px;
+        }
+        .tagline
+        {
+            text-align:center;
+            font-size: 18px;
+        }
+        .info ul
+        {
+            margin:0;
+            padding:0;
+            list-style:none;
+            display:inline-block;
+            text-align:left;
+            font-family:Arial;
+            padding-bottom:10px;
+        }
+        .info ul li
+        {
+            display:none;
+        }
+        .counter
+        {
+            font-family:Arial;
+            font-size:20px;
+            font-weight:bold;
+        }
+        .info ul li.placeholdertext
+        {
+            display:inline-block;
+            font-size:16px;
+        }
+        .info ul li.visible
+        {
+            display:block;
+        }
+    </style>
+    <h1>Little Pet's Brat Risk</h1>
+    <div class="container">
+        <div class="wheelcontainer">
+           <h2>Risk</h2>
+           <ul class="wheel" id="bratwheel">
+                <li amount=10><span>+10 seconds mouth soaping</span></li>
+                <li amount=2><span>+2 spanks</span></li>
+                <li amount=1><span>+1 minute corner time</span></li>
+                <li amount=1><span>+1 line</span></li>
+            </ul> 
+            <button id="bratbutton">
+                <img class="devil" src="devil.png" />Brat!
+                <div class="spincount bratcount">01</div>
+            </button>
+        </div>
+        <div class="info">
+            <h2>Level: <span class="lvl">1</span></h2>
+            <div class="stats">
+                <p class="story">Your Dom is asleep. You've been chained to the foot of the bed and you've been awake for the last half hour and you're incredibly bored. You're thinking of a way that might wake him up without arousing too much suspicion. You're supposed to be sitting up quietly after all.
+    You see a feather poking out from the cusion and you grab it. You carefully lift the duvet and bare your Doms' feet and tickle them with the feather.
+    he is almost waking up now...</p>
+            </div>
+            <p class="tagline">Stop and <span class="good">be good</span>, or <span class="brat">brat</span> and continue?</p>
+            <h2>Punishments</h2>
+            <ul>
+                <li><span id="inc0" class="counter">0</span> seconds of mouthsoaping.</li>
+                <li><span id="inc1" class="counter">0</span> spanks to your bottom.</li>
+                <li><span id="inc2" class="counter">0</span> minutes of cornertime.</li>
+                <li><span id="inc3" class="counter">0</span> lines of "I am a very naughty little brat".</li>
+                <li class="placeholdertext">None yet!</li>
+            </ul>
+            <h2 id="rewardsh2">Rewards</h2>
+            <ul>
+                <li><span id="rew0" class="counter">0</span> cute pictures to post on a Dom's visitor page.</li>
+                <li><span id="rew1" class="counter">0</span> disney songs to listen to.</li>
+                <li><span id="rew2" class="counter">0</span> cookie/candy/other treat.</li>
+                <li><span id="rew3" class="counter">0</span> minutes of masturbation.</li>
+                <li class="placeholdertext">None yet!</li>
+            </ul>
+        </div>
+        <div class="wheelcontainer rewardcontainer">
+           <h2>Reward</h2>
+           <ul class="wheel" id="goodwheel">
+                <li amount=1><span>+1 cute picture</span></li>
+                <li amount=1><span>+1 disney song</span></li>
+                <li amount=1><span>+1 treat</span></li>
+                <li amount=5><span>+5 minutes of masturbation</span></li>
+            </ul> 
+            <button id="goodbutton">
+                <img class="angel" src="angel.png" />Be good
+                <div class="spincount goodcount">10</div>
+            </button>
+        </div>
+        
+    </div>
+    
+</body>
+</html>
